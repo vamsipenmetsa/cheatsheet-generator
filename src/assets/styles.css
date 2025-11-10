@@ -1,0 +1,37 @@
+body {
+    background-color: #282a36;
+    color: #f8f8f2;
+    font-family: 'Fira Code', monospace;
+    line-height: 1.5;
+}
+
+input[type="text"] {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border: 1px solid #6272a4;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #50fa7b;
+}
+
+.cheat-sheet {
+    background-color: #44475a;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #6272a4;
+    border-radius: 0.5rem;
+}
