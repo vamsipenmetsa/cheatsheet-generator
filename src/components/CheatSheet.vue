@@ -53,7 +53,7 @@
               <span class="text-[#ffb86c]">cheatsheet</span>
             </div>
             <div v-if="formattedText" class="whitespace-pre-wrap break-words" style="white-space: pre-wrap; tab-size: 4; -moz-tab-size: 4; word-break: break-word;">
-              <div v-for="(line, index) in highlightedLines" :key="index" :style="line.style" v-html="line.html"></div>
+              <div v-for="(line, index) in highlightedLines" :key="index" :class="line.class" v-html="line.html"></div>
             </div>
             <div v-else class="text-[#6272a4] italic text-center py-8">
               <div class="text-2xl mb-2">📋</div>
@@ -198,10 +198,9 @@ export default {
         // Highlight headings (lines starting with #)
         if (line.trim().startsWith('#')) {
           const level = (line.match(/^#+/) || [''])[0].length;
-          const colors = ['#bd93f9', '#ff79c6', '#8be9fd', '#ffb86c'];
-          const color = colors[Math.min(level - 1, colors.length - 1)];
+          const className = `hl-heading-${Math.min(level, 4)}`;
           return {
-            style: `color: ${color}; font-weight: bold; margin-top: 8px; font-size: ${14 - level * 0.5}px;`,
+            class: className,
             html: this.escapeHtml(line)
           };
         }
@@ -210,30 +209,30 @@ export default {
           let highlightedLine = this.escapeHtml(line);
           
           // Highlight $ prompt
-          highlightedLine = highlightedLine.replace(/\$/g, '<span style="color: #50fa7b; font-weight: bold;">$</span>');
+          highlightedLine = highlightedLine.replace(/\$/g, '<span class="hl-command">$</span>');
           
           // Highlight backtick commands
-          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span style="color: #8be9fd; font-weight: 600; background: rgba(98, 114, 164, 0.2); padding: 2px 4px; border-radius: 3px;">$1</span>');
+          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span class="hl-backtick">$1</span>');
           
           // Highlight common commands
           highlightedLine = highlightedLine.replace(/(\s|^|\$\s*)(kubectl|docker|npm|yarn|git|cd|ls|cat|grep|awk|sed|curl|wget|ssh|sudo|apt|yum|pip|python|node|java|mvn|gradle|terraform|ansible|helm|make|cargo|rustc|go|bash|zsh|powershell|az|gcloud|aws)(\s+|$)/g, 
-            '$1<span style="color: #50fa7b; font-weight: bold;">$2</span>$3');
+            '$1<span class="hl-command">$2</span>$3');
           
           // Highlight flags/options
-          highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span style="color: #ffb86c;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span class="hl-flag">$1</span>');
           
           // Highlight strings in quotes
-          highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span style="color: #f1fa8c;">"$1"</span>');
-          highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span style="color: #f1fa8c;">\'$1\'</span>');
+          highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span class="hl-string">"$1"</span>');
+          highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span class="hl-string">\'$1\'</span>');
           
           // Highlight numbers
-          highlightedLine = highlightedLine.replace(/\b(\d+)\b/g, '<span style="color: #bd93f9;">$1</span>');
+          highlightedLine = highlightedLine.replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
           
           // Highlight paths
-          highlightedLine = highlightedLine.replace(/(\/?[\w.-]+\/[\w./-]+)/g, '<span style="color: #8be9fd;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(\/?[\w.-]+\/[\w./-]+)/g, '<span class="hl-path">$1</span>');
           
           return {
-            style: 'color: #f8f8f2;',
+            class: 'hl-default',
             html: highlightedLine
           };
         }
@@ -241,9 +240,9 @@ export default {
         else if (line.includes(':') && !line.trim().startsWith('-')) {
           let highlightedLine = this.escapeHtml(line);
           highlightedLine = highlightedLine.replace(/^(\s*)([^:]+)(:)(.*)$/g, 
-            '$1<span style="color: #ff79c6; font-weight: 600;">$2</span><span style="color: #f8f8f2;">$3</span><span style="color: #f1fa8c;">$4</span>');
+            '$1<span class="hl-key">$2</span><span class="hl-default">$3</span><span class="hl-value">$4</span>');
           return {
-            style: '',
+            class: '',
             html: highlightedLine
           };
         }
@@ -251,16 +250,16 @@ export default {
         else if (line.trim().match(/^[-*•]\s/)) {
           let highlightedLine = this.escapeHtml(line);
           highlightedLine = highlightedLine.replace(/^(\s*)([-*•])(\s+)(.*)$/, 
-            '$1<span style="color: #50fa7b; font-weight: bold;">$2</span>$3<span style="color: #f8f8f2;">$4</span>');
+            '$1<span class="hl-bullet">$2</span>$3<span class="hl-default">$4</span>');
           return {
-            style: '',
+            class: '',
             html: highlightedLine
           };
         }
         // Highlight comments
         else if (line.trim().match(/^(\/\/|#)/)) {
           return {
-            style: 'color: #6272a4; font-style: italic;',
+            class: 'hl-comment',
             html: this.escapeHtml(line)
           };
         }
@@ -268,15 +267,15 @@ export default {
         else if (line.includes('=') && !line.trim().startsWith('-')) {
           let highlightedLine = this.escapeHtml(line);
           highlightedLine = highlightedLine.replace(/^(\s*)([^=]+)(=)(.*)$/g, 
-            '$1<span style="color: #ff79c6;">$2</span><span style="color: #f8f8f2;">$3</span><span style="color: #f1fa8c;">$4</span>');
+            '$1<span class="hl-key">$2</span><span class="hl-default">$3</span><span class="hl-value">$4</span>');
           return {
-            style: '',
+            class: '',
             html: highlightedLine
           };
         }
         // Default color for regular text
         return {
-          style: 'color: #f8f8f2;',
+          class: 'hl-default',
           html: this.escapeHtml(line)
         };
       });
@@ -446,8 +445,7 @@ export default {
 </script>
 
 <style scoped>
-/* Dracula theme colors are applied inline for better control */
-/* Ensure monospace font is used */
+/* Dracula theme syntax highlighting colors */
 .font-mono {
   font-family: 'Fira Code', 'Source Code Pro', 'Monaco', 'Menlo', monospace;
 }
@@ -465,5 +463,29 @@ textarea {
   white-space: pre-wrap;
   tab-size: 4;
   -moz-tab-size: 4;
+}
+
+/* Dracula syntax highlighting - scoped styles for production build */
+:deep(.hl-heading-1) { color: #bd93f9; font-weight: bold; margin-top: 8px; font-size: 14px; }
+:deep(.hl-heading-2) { color: #ff79c6; font-weight: bold; margin-top: 8px; font-size: 13.5px; }
+:deep(.hl-heading-3) { color: #8be9fd; font-weight: bold; margin-top: 8px; font-size: 13px; }
+:deep(.hl-heading-4) { color: #ffb86c; font-weight: bold; margin-top: 8px; font-size: 12.5px; }
+
+:deep(.hl-command) { color: #50fa7b; font-weight: bold; }
+:deep(.hl-flag) { color: #ffb86c; }
+:deep(.hl-string) { color: #f1fa8c; }
+:deep(.hl-number) { color: #bd93f9; }
+:deep(.hl-path) { color: #8be9fd; }
+:deep(.hl-key) { color: #ff79c6; font-weight: 600; }
+:deep(.hl-value) { color: #f1fa8c; }
+:deep(.hl-bullet) { color: #50fa7b; font-weight: bold; }
+:deep(.hl-comment) { color: #6272a4; font-style: italic; }
+:deep(.hl-default) { color: #f8f8f2; }
+:deep(.hl-backtick) { 
+  color: #8be9fd; 
+  font-weight: 600; 
+  background: rgba(98, 114, 164, 0.2); 
+  padding: 2px 4px; 
+  border-radius: 3px; 
 }
 </style>
