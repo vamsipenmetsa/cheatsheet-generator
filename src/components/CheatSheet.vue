@@ -523,7 +523,7 @@ export default {
         left: 15px;
         display: flex;
         gap: 10px;
-        z-index: 10;
+        z-index: 20;
       `;
 
       // Red close button with shadow
@@ -534,7 +534,9 @@ export default {
         background: linear-gradient(135deg, #ff5f57 0%, #ff3b30 100%);
         border-radius: 50%;
         border: 1px solid #cc4c46;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 21;
       `;
 
       // Yellow minimize button with shadow
@@ -545,7 +547,9 @@ export default {
         background: linear-gradient(135deg, #ffbd2e 0%, #ffb700 100%);
         border-radius: 50%;
         border: 1px solid #cc9600;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 21;
       `;
 
       // Green maximize button with shadow
@@ -556,7 +560,9 @@ export default {
         background: linear-gradient(135deg, #28ca42 0%, #00c853 100%);
         border-radius: 50%;
         border: 1px solid #1e9e33;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 21;
       `;
 
       controlsDiv.appendChild(redButton);
@@ -578,7 +584,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 10;
+        z-index: 15;
       `;
 
       const titleText = document.createElement('span');
