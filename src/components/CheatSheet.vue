@@ -17,52 +17,7 @@
           placeholder="Paste your cheat sheet text here with proper indentation..."
           class="w-full h-48 p-4 border border-gray-600 rounded-lg bg-gray-900/80 text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none"
           style="white-space: pre; tab-size: 4; -moz-tab-size: 4;"
-        >
-WHAT IS A NODE
-| - A Node is a worker machine (VM or physical) in a Kubernetes cluster.       |
-| - It runs Pods and provides the compute, storage, and networking resources.  |
-| - Each cluster has at least one Node; managed by the control plane.          |
-+------------------------------------------------------------------------------+
-| CORE COMPONENTS ON A NODE                                                    |
-| - kubelet: Ensures containers are running in their Pods.                     |
-| - kube-proxy: Handles networking and load-balancing for services.            |
-| - Container Runtime: Executes containers (e.g., containerd, CRI-O).          |
-+------------------------------------------------------------------------------+
-| NODE STATUS CONDITIONS                                                       |
-| - Ready: Node is healthy and can accept Pods.                                |
-| - NotReady: Node is unreachable or unhealthy.                                |
-| - SchedulingDisabled: Node is cordoned (unschedulable).                      |
-+------------------------------------------------------------------------------+
-| ESSENTIAL COMMANDS                                                           |
-| - List Nodes:        kubectl get nodes                                       |
-| - Describe Node:     kubectl describe node &lt;node-name&gt;                       |
-| - Cordon Node:       kubectl cordon &lt;node-name&gt;                              |
-| - Uncordon Node:     kubectl uncordon &lt;node-name&gt;                            |
-| - Drain Node:        kubectl drain &lt;node-name&gt; --ignore-daemonsets           |
-| - Label Node:        kubectl label nodes &lt;node-name&gt; key=value               |
-| - Taint Node:        kubectl taint nodes &lt;node-name&gt; key=value:NoSchedule    |
-+------------------------------------------------------------------------------+
-| NODE SCHEDULING                                                              |
-| - Labels: Key-value pairs to identify and group Nodes.                       |
-| - NodeSelector: Assign Pods to Nodes with matching labels.                   |
-| - Node Affinity: Advanced rules for flexible scheduling.                     |
-+------------------------------------------------------------------------------+
-| RESOURCE MANAGEMENT                                                          |
-| - Capacity: Total available CPU, memory, and storage.                        |
-| - Allocatable: Resources available for Pods after system overhead.           |
-| - View: kubectl describe node &lt;node-name&gt;                                    |
-+------------------------------------------------------------------------------+
-| SECURITY &amp; AUTHENTICATION                                                    |
-| - Nodes authenticate to the control plane using TLS certificates.            |
-| - kubelet uses secure channels to communicate with the API server.           |
-+------------------------------------------------------------------------------+
-| BEST PRACTICES                                                               |
-| - Monitor node health and resource usage regularly.                          |
-| - Use taints and tolerations to control Pod placement.                       |
-| - Apply labels and affinity rules for intelligent scheduling.                |
-+------------------------------------------------------------------------------+
-|                     FOLLOW @VamsiPenmetsa FOR MORE CHEAT SHEETS
-        </textarea>
+        ></textarea>
       </div>
 
       <!-- Preview Section -->
@@ -163,26 +118,6 @@ export default {
           const colors = ['#bd93f9', '#ff79c6', '#8be9fd', '#ffb86c']; // Purple, Pink, Cyan, Orange
           const color = colors[Math.min(level - 1, colors.length - 1)];
           return `<div style="color: ${color}; font-weight: bold; margin-top: 8px; font-size: ${14 - level * 0.5}px;">${this.escapeHtml(line)}</div>`;
-        }
-        // Highlight section titles (all uppercase lines, or lines with borders)
-        else if (line.trim().match(/^[A-Z\s&@]+$/) && line.trim().length > 3 && !line.includes('$') && !line.includes('=')) {
-          // Check if it's a section title (not just random uppercase text)
-          const sectionKeywords = ['WHAT', 'CORE', 'NODE', 'ESSENTIAL', 'SECURITY', 'BEST', 'RESOURCE', 'FOLLOW', 'COMPONENTS', 'STATUS', 'SCHEDULING', 'AUTHENTICATION', 'PRACTICES'];
-          const hasSectionKeyword = sectionKeywords.some(keyword => line.toUpperCase().includes(keyword));
-          if (hasSectionKeyword || line.trim().match(/^[A-Z\s]{10,}$/)) {
-            return `<div style="color: #ffb86c; font-weight: bold; font-size: 14px; margin-top: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #ffb86c; padding-bottom: 4px;">${this.escapeHtml(line.trim())}</div>`;
-          }
-        }
-        // Highlight border lines (lines with +---+ or |---+ patterns)
-        else if (line.trim().match(/^[\+\-\|]+$/) || line.trim().match(/^[\+\-\| ]+$/)) {
-          return `<div style="color: #6272a4; font-weight: bold;">${this.escapeHtml(line)}</div>`;
-        }
-        // Highlight table rows (lines starting with |)
-        else if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
-          let highlightedLine = this.escapeHtml(line);
-          // Highlight the pipe separators
-          highlightedLine = highlightedLine.replace(/\|/g, '<span style="color: #6272a4; font-weight: bold;">|</span>');
-          return `<div>${highlightedLine}</div>`;
         }
         // Highlight commands (lines containing $ or commands with ` backticks)
         else if (line.includes('$') || line.match(/`[^`]+`/)) {
