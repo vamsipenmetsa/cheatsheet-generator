@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 py-8 max-w-5xl">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold mb-2" style="color: #bd93f9; text-shadow: 0 0 20px rgba(189, 147, 249, 0.5);">
+        <h1 class="text-4xl font-bold mb-2" style="color: #bd93f9;">
           🖥️ Cheatsheet Generator
         </h1>
         <p class="text-lg" style="color: #8be9fd;">Create beautiful terminal-style cheat sheets with Dracula theme</p>
@@ -45,8 +45,8 @@
           </div>
 
           <!-- Terminal Content -->
-          <div class="p-6 bg-[#282a36] text-[#f8f8f2] font-mono text-sm leading-relaxed min-h-[400px] max-h-[600px] overflow-auto">
-            <div class="mb-3 opacity-75">
+          <div class="p-8 bg-[#282a36] text-[#f8f8f2] font-mono text-sm min-h-[400px] max-h-[600px] overflow-auto" style="line-height: 1.8; letter-spacing: 0.3px;">
+            <div class="mb-4 opacity-75">
               <span class="text-[#50fa7b]">vamsi@macbook</span>
               <span class="text-[#6272a4]">:~</span>
               <span class="text-white">$ </span>
@@ -60,7 +60,7 @@
               # Your cheat sheet will appear here...<br>
               # Paste your content above and see the magic!
             </div>
-            <div class="mt-4 opacity-75">
+            <div class="mt-6 opacity-75">
               <span class="text-[#50fa7b]">vamsi@macbook</span>
               <span class="text-[#6272a4]">:~</span>
               <span class="text-white">$ </span>
@@ -192,6 +192,102 @@ export default {
       return div.innerHTML;
     },
     
+    // Generate HTML with inline styles for export (html2canvas needs inline styles)
+    getExportHighlightedHTML(text) {
+      const lines = text.split('\n');
+      return lines.map(line => {
+        // Highlight headings (lines starting with #)
+        if (line.trim().startsWith('#')) {
+          const level = (line.match(/^#+/) || [''])[0].length;
+          const styles = [
+            'color: #bd93f9; font-weight: bold; margin-top: 16px; margin-bottom: 8px; font-size: 15px; border-bottom: 2px solid rgba(189, 147, 249, 0.3); padding-bottom: 6px; line-height: 1.4;',
+            'color: #ff79c6; font-weight: bold; margin-top: 14px; margin-bottom: 6px; font-size: 14px; line-height: 1.4;',
+            'color: #8be9fd; font-weight: bold; margin-top: 12px; margin-bottom: 4px; font-size: 13.5px; line-height: 1.4;',
+            'color: #ffb86c; font-weight: bold; margin-top: 10px; margin-bottom: 3px; font-size: 13px; line-height: 1.4;'
+          ];
+          const style = styles[Math.min(level - 1, styles.length - 1)];
+          return `<div style="${style}">${this.escapeHtml(line)}</div>`;
+        }
+        // Highlight commands
+        else if (line.includes('$') || line.match(/`[^`]+`/)) {
+          let highlightedLine = this.escapeHtml(line);
+          
+          highlightedLine = highlightedLine.replace(/\$/g, '<span style="color: #50fa7b; font-weight: bold;">$</span>');
+          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span style="color: #8be9fd; font-weight: 600; background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 233, 253, 0.3);">$1</span>');
+          highlightedLine = highlightedLine.replace(/(\s|^|\$\s*)(kubectl|docker|npm|yarn|git|cd|ls|cat|grep|awk|sed|curl|wget|ssh|sudo|apt|yum|pip|python|node|java|mvn|gradle|terraform|ansible|helm|make|cargo|rustc|go|bash|zsh|powershell|az|gcloud|aws|ng|vue|react|vite|jest|mocha|pytest|cargo|composer|bundle)(\s+|$)/g, 
+            '$1<span style="color: #50fa7b; font-weight: bold;">$2</span>$3');
+          highlightedLine = highlightedLine.replace(/(kubectl|docker|git|npm|yarn|az|gcloud|aws)\s+<\/span>\s*(\w+)/g, 
+            '$1 </span><span style="color: #8be9fd;">$2</span>');
+          highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span style="color: #ffb86c; font-weight: 500;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(\s)(=|&gt;|&lt;|\||&amp;&amp;|\|\||&amp;)(\s)/g, '$1<span style="color: #ff79c6; font-weight: bold; padding: 0 2px;">$2</span>$3');
+          highlightedLine = highlightedLine.replace(/([{\[\(])/g, '<span style="color: #f8f8f2; font-weight: bold;">$1</span>');
+          highlightedLine = highlightedLine.replace(/([}\]\)])/g, '<span style="color: #f8f8f2; font-weight: bold;">$1</span>');
+          highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span style="color: #f1fa8c; font-style: italic;">"$1"</span>');
+          highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span style="color: #f1fa8c; font-style: italic;">\'$1\'</span>');
+          highlightedLine = highlightedLine.replace(/\b(0x[0-9a-fA-F]+|\d+\.?\d*)\b/g, '<span style="color: #bd93f9; font-weight: 600;">$1</span>');
+          highlightedLine = highlightedLine.replace(/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/g, '<span style="color: #8be9fd;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(https?:\/\/[^\s]+)/g, '<span style="color: #8be9fd; text-decoration: underline; text-decoration-color: rgba(139, 233, 253, 0.3);">$1</span>');
+          highlightedLine = highlightedLine.replace(/(\/?[\w.-]+\/[\w./-]+)/g, '<span style="color: #8be9fd; text-decoration: underline; text-decoration-color: rgba(139, 233, 253, 0.3); text-underline-offset: 2px;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(\$[A-Z_][A-Z0-9_]*)/g, '<span style="color: #8be9fd;">$1</span>');
+          
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 2px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+        // Highlight YAML/JSON keys
+        else if (line.includes(':') && !line.trim().startsWith('-')) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/^(\s*)([^:]+)(:)(.*)$/g, 
+            '$1<span style="color: #ff79c6; font-weight: 700; text-shadow: 0 0 5px rgba(255, 121, 198, 0.3);">$2</span><span style="color: #f8f8f2;">$3</span><span style="color: #f1fa8c; margin-left: 6px;">$4</span>');
+          return `<div style="line-height: 1.8; margin-bottom: 2px;">${highlightedLine}</div>`;
+        }
+        // Highlight list items
+        else if (line.trim().match(/^[-*•]\s/)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/^(\s*)([-*•])(\s+)(.*)$/, 
+            '$1<span style="color: #50fa7b; font-weight: bold; font-size: 16px; margin-right: 4px;">$2</span><span style="padding-left: 4px;"></span><span style="color: #f8f8f2;">$4</span>');
+          return `<div style="line-height: 1.9; margin-bottom: 3px;">${highlightedLine}</div>`;
+        }
+        // Highlight comments
+        else if (line.trim().match(/^(\/\/|#)/)) {
+          return `<div style="color: #6272a4; font-style: italic; opacity: 0.8; line-height: 1.7; margin-bottom: 2px;">${this.escapeHtml(line)}</div>`;
+        }
+        // Highlight assignments
+        else if (line.includes('=') && !line.trim().startsWith('-')) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/^(\s*)([^=]+)(=)(.*)$/g, 
+            '$1<span style="color: #ff79c6; font-weight: 700;">$2</span><span style="color: #f8f8f2; padding: 0 4px;">$3</span><span style="color: #f1fa8c;">$4</span>');
+          return `<div style="line-height: 1.8; margin-bottom: 2px;">${highlightedLine}</div>`;
+        }
+        // Special keywords
+        else if (line.match(/\b(ERROR|FAIL|FAILED|FAILURE)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(ERROR|FAIL|FAILED|FAILURE)\b/gi, '<span style="color: #ff5555; font-weight: bold; padding: 2px 6px; background: rgba(255, 85, 85, 0.15); border-radius: 3px;">$1</span>');
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 3px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+        else if (line.match(/\b(SUCCESS|PASS|PASSED|OK|DONE)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(SUCCESS|PASS|PASSED|OK|DONE)\b/gi, '<span style="color: #50fa7b; font-weight: bold; padding: 2px 6px; background: rgba(80, 250, 123, 0.15); border-radius: 3px;">$1</span>');
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 3px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+        else if (line.match(/\b(WARNING|WARN|CAUTION|DEPRECATED)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(WARNING|WARN|CAUTION|DEPRECATED)\b/gi, '<span style="color: #ffb86c; font-weight: bold; padding: 2px 6px; background: rgba(255, 184, 108, 0.15); border-radius: 3px;">$1</span>');
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 3px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+        else if (line.match(/\b(INFO|NOTE|TIP|HINT)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(INFO|NOTE|TIP|HINT)\b/gi, '<span style="color: #8be9fd; font-weight: 600; padding: 2px 6px; background: rgba(139, 233, 253, 0.15); border-radius: 3px;">$1</span>');
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 3px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+        // Default with backticks and CAPS highlighting
+        else {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span style="color: #8be9fd; font-weight: 600; background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); padding: 3px 7px; border-radius: 4px; border: 1px solid rgba(139, 233, 253, 0.3);">$1</span>');
+          highlightedLine = highlightedLine.replace(/\b([A-Z][A-Z0-9_]{2,})\b/g, '<span style="color: #8be9fd; font-weight: 600;">$1</span>');
+          return `<div style="color: #f8f8f2; line-height: 1.8; margin-bottom: 2px; padding-left: 4px;">${highlightedLine}</div>`;
+        }
+      }).join('');
+    },
+    
     getHighlightedLines(text) {
       const lines = text.split('\n');
       return lines.map(line => {
@@ -214,22 +310,42 @@ export default {
           // Highlight backtick commands
           highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span class="hl-backtick">$1</span>');
           
-          // Highlight common commands
-          highlightedLine = highlightedLine.replace(/(\s|^|\$\s*)(kubectl|docker|npm|yarn|git|cd|ls|cat|grep|awk|sed|curl|wget|ssh|sudo|apt|yum|pip|python|node|java|mvn|gradle|terraform|ansible|helm|make|cargo|rustc|go|bash|zsh|powershell|az|gcloud|aws)(\s+|$)/g, 
+          // Highlight common commands with more variety
+          highlightedLine = highlightedLine.replace(/(\s|^|\$\s*)(kubectl|docker|npm|yarn|git|cd|ls|cat|grep|awk|sed|curl|wget|ssh|sudo|apt|yum|pip|python|node|java|mvn|gradle|terraform|ansible|helm|make|cargo|rustc|go|bash|zsh|powershell|az|gcloud|aws|ng|vue|react|vite|jest|mocha|pytest|cargo|composer|bundle)(\s+|$)/g, 
             '$1<span class="hl-command">$2</span>$3');
+          
+          // Highlight subcommands (after main commands)
+          highlightedLine = highlightedLine.replace(/(kubectl|docker|git|npm|yarn|az|gcloud|aws)\s+<\/span>\s*(\w+)/g, 
+            '$1 </span><span class="hl-info">$2</span>');
           
           // Highlight flags/options
           highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span class="hl-flag">$1</span>');
+          
+          // Highlight operators (=, >, <, |, &, &&, ||)
+          highlightedLine = highlightedLine.replace(/(\s)(=|&gt;|&lt;|\||&amp;&amp;|\|\||&amp;)(\s)/g, '$1<span class="hl-operator">$2</span>$3');
+          
+          // Highlight brackets and parentheses
+          highlightedLine = highlightedLine.replace(/([{\[\(])/g, '<span class="hl-bracket">$1</span>');
+          highlightedLine = highlightedLine.replace(/([}\]\)])/g, '<span class="hl-bracket">$1</span>');
           
           // Highlight strings in quotes
           highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span class="hl-string">"$1"</span>');
           highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span class="hl-string">\'$1\'</span>');
           
-          // Highlight numbers
-          highlightedLine = highlightedLine.replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+          // Highlight numbers (including decimals, hex, etc.)
+          highlightedLine = highlightedLine.replace(/\b(0x[0-9a-fA-F]+|\d+\.?\d*)\b/g, '<span class="hl-number">$1</span>');
           
-          // Highlight paths
+          // Highlight IP addresses
+          highlightedLine = highlightedLine.replace(/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/g, '<span class="hl-info">$1</span>');
+          
+          // Highlight URLs (http/https)
+          highlightedLine = highlightedLine.replace(/(https?:\/\/[^\s]+)/g, '<span class="hl-path">$1</span>');
+          
+          // Highlight file paths
           highlightedLine = highlightedLine.replace(/(\/?[\w.-]+\/[\w./-]+)/g, '<span class="hl-path">$1</span>');
+          
+          // Highlight environment variables ($VAR)
+          highlightedLine = highlightedLine.replace(/(\$[A-Z_][A-Z0-9_]*)/g, '<span class="hl-info">$1</span>');
           
           return {
             class: 'hl-default',
@@ -273,11 +389,51 @@ export default {
             html: highlightedLine
           };
         }
-        // Default color for regular text
-        return {
-          class: 'hl-default',
-          html: this.escapeHtml(line)
-        };
+        // Highlight special keywords (ERROR, WARNING, SUCCESS, INFO, etc.)
+        else if (line.match(/\b(ERROR|FAIL|FAILED|FAILURE)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(ERROR|FAIL|FAILED|FAILURE)\b/gi, '<span class="hl-error">$1</span>');
+          return {
+            class: 'hl-default',
+            html: highlightedLine
+          };
+        }
+        else if (line.match(/\b(SUCCESS|PASS|PASSED|OK|DONE)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(SUCCESS|PASS|PASSED|OK|DONE)\b/gi, '<span class="hl-success">$1</span>');
+          return {
+            class: 'hl-default',
+            html: highlightedLine
+          };
+        }
+        else if (line.match(/\b(WARNING|WARN|CAUTION|DEPRECATED)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(WARNING|WARN|CAUTION|DEPRECATED)\b/gi, '<span class="hl-warning">$1</span>');
+          return {
+            class: 'hl-default',
+            html: highlightedLine
+          };
+        }
+        else if (line.match(/\b(INFO|NOTE|TIP|HINT)\b/i)) {
+          let highlightedLine = this.escapeHtml(line);
+          highlightedLine = highlightedLine.replace(/\b(INFO|NOTE|TIP|HINT)\b/gi, '<span class="hl-info">$1</span>');
+          return {
+            class: 'hl-default',
+            html: highlightedLine
+          };
+        }
+        // Default color for regular text with enhanced formatting
+        else {
+          let highlightedLine = this.escapeHtml(line);
+          // Highlight anything in backticks even in regular text
+          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span class="hl-backtick">$1</span>');
+          // Highlight words in CAPS (potential constants or important terms)
+          highlightedLine = highlightedLine.replace(/\b([A-Z][A-Z0-9_]{2,})\b/g, '<span class="hl-info">$1</span>');
+          return {
+            class: 'hl-default',
+            html: highlightedLine
+          };
+        }
       });
     },
     
@@ -299,7 +455,7 @@ export default {
         tab-size: 4;
         -moz-tab-size: 4;
         word-break: break-word;
-        padding: 50px 25px 25px 25px;
+        padding: 50px 35px 30px 35px;
         border-radius: 12px;
         width: fit-content;
         min-width: 500px;
@@ -386,16 +542,17 @@ export default {
       titleBar.appendChild(titleText);
       tempElement.appendChild(titleBar);
 
-      // Add the text content with syntax highlighting
+      // Add the text content with enhanced syntax highlighting for export
       const textDiv = document.createElement('div');
       textDiv.style.cssText = `
         margin-top: 10px;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         white-space: pre-wrap;
         tab-size: 4;
         -moz-tab-size: 4;
+        line-height: 1.8;
+        letter-spacing: 0.3px;
       `;
-      textDiv.innerHTML = this.applySyntaxHighlighting(this.formattedText);
+      textDiv.innerHTML = this.getExportHighlightedHTML(this.formattedText);
       tempElement.appendChild(textDiv);
 
       // Add a subtle footer with attribution
@@ -466,26 +623,150 @@ textarea {
 }
 
 /* Dracula syntax highlighting - scoped styles for production build */
-:deep(.hl-heading-1) { color: #bd93f9; font-weight: bold; margin-top: 8px; font-size: 14px; }
-:deep(.hl-heading-2) { color: #ff79c6; font-weight: bold; margin-top: 8px; font-size: 13.5px; }
-:deep(.hl-heading-3) { color: #8be9fd; font-weight: bold; margin-top: 8px; font-size: 13px; }
-:deep(.hl-heading-4) { color: #ffb86c; font-weight: bold; margin-top: 8px; font-size: 12.5px; }
+:deep(.hl-heading-1) { 
+  color: #bd93f9; 
+  font-weight: bold; 
+  margin-top: 16px; 
+  margin-bottom: 8px;
+  font-size: 15px; 
+  line-height: 1.4;
+  border-bottom: 2px solid rgba(189, 147, 249, 0.3);
+  padding-bottom: 6px;
+}
+:deep(.hl-heading-2) { 
+  color: #ff79c6; 
+  font-weight: bold; 
+  margin-top: 14px; 
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+:deep(.hl-heading-3) { 
+  color: #8be9fd; 
+  font-weight: bold; 
+  margin-top: 12px; 
+  margin-bottom: 4px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+:deep(.hl-heading-4) { 
+  color: #ffb86c; 
+  font-weight: bold; 
+  margin-top: 10px; 
+  margin-bottom: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+}
 
-:deep(.hl-command) { color: #50fa7b; font-weight: bold; }
-:deep(.hl-flag) { color: #ffb86c; }
-:deep(.hl-string) { color: #f1fa8c; }
-:deep(.hl-number) { color: #bd93f9; }
-:deep(.hl-path) { color: #8be9fd; }
-:deep(.hl-key) { color: #ff79c6; font-weight: 600; }
-:deep(.hl-value) { color: #f1fa8c; }
-:deep(.hl-bullet) { color: #50fa7b; font-weight: bold; }
-:deep(.hl-comment) { color: #6272a4; font-style: italic; }
-:deep(.hl-default) { color: #f8f8f2; }
+:deep(.hl-command) { 
+  color: #50fa7b; 
+  font-weight: bold;
+  line-height: 1.8;
+  margin-bottom: 2px;
+  padding-left: 4px;
+}
+:deep(.hl-flag) { 
+  color: #ffb86c;
+  font-weight: 500;
+}
+:deep(.hl-string) { 
+  color: #f1fa8c;
+  font-style: italic;
+}
+:deep(.hl-number) { 
+  color: #bd93f9;
+  font-weight: 600;
+}
+:deep(.hl-path) { 
+  color: #8be9fd;
+  text-decoration: underline;
+  text-decoration-color: rgba(139, 233, 253, 0.3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+:deep(.hl-key) { 
+  color: #ff79c6; 
+  font-weight: 700;
+  line-height: 1.8;
+  margin-bottom: 2px;
+}
+:deep(.hl-value) { 
+  color: #f1fa8c;
+  margin-left: 6px;
+}
+:deep(.hl-bullet) { 
+  color: #50fa7b; 
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 4px;
+  line-height: 1.9;
+  margin-bottom: 3px;
+}
+:deep(.hl-comment) { 
+  color: #6272a4; 
+  font-style: italic;
+  opacity: 0.8;
+  line-height: 1.7;
+  margin-bottom: 2px;
+}
+:deep(.hl-default) { 
+  color: #f8f8f2;
+  line-height: 1.8;
+  margin-bottom: 2px;
+  padding-left: 4px;
+}
 :deep(.hl-backtick) { 
   color: #8be9fd; 
   font-weight: 600; 
-  background: rgba(98, 114, 164, 0.2); 
-  padding: 2px 4px; 
-  border-radius: 3px; 
+  background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); 
+  padding: 3px 7px; 
+  border-radius: 4px;
+  border: 1px solid rgba(139, 233, 253, 0.3);
+  box-shadow: 0 0 8px rgba(139, 233, 253, 0.2);
+}
+:deep(.hl-operator) {
+  color: #ff79c6;
+  font-weight: bold;
+  padding: 0 4px;
+}
+:deep(.hl-bracket) {
+  color: #f8f8f2;
+  font-weight: bold;
+}
+:deep(.hl-error) {
+  color: #ff5555;
+  font-weight: bold;
+  padding: 2px 6px;
+  background: rgba(255, 85, 85, 0.15);
+  border-radius: 3px;
+  line-height: 1.8;
+  margin-bottom: 3px;
+}
+:deep(.hl-success) {
+  color: #50fa7b;
+  font-weight: bold;
+  padding: 2px 6px;
+  background: rgba(80, 250, 123, 0.15);
+  border-radius: 3px;
+  line-height: 1.8;
+  margin-bottom: 3px;
+}
+:deep(.hl-warning) {
+  color: #ffb86c;
+  font-weight: bold;
+  padding: 2px 6px;
+  background: rgba(255, 184, 108, 0.15);
+  border-radius: 3px;
+  line-height: 1.8;
+  margin-bottom: 3px;
+}
+:deep(.hl-info) {
+  color: #8be9fd;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(139, 233, 253, 0.15);
+  border-radius: 3px;
+  line-height: 1.8;
+  margin-bottom: 3px;
 }
 </style>
