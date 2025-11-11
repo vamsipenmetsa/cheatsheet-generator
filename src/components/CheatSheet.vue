@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 py-8 max-w-5xl">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold mb-2" style="color: #bd93f9;">
+        <h1 class="text-4xl font-bold mb-2" style="color: #bd93f9; text-shadow: 0 0 20px rgba(189, 147, 249, 0.5);">
           🖥️ Cheatsheet Generator
         </h1>
         <p class="text-lg" style="color: #8be9fd;">Create beautiful terminal-style cheat sheets with Dracula theme</p>
@@ -45,22 +45,33 @@
           </div>
 
           <!-- Terminal Content -->
-          <div class="p-8 bg-[#282a36] text-[#f8f8f2] font-mono text-sm min-h-[400px] max-h-[600px] overflow-auto" style="line-height: 1.8; letter-spacing: 0.3px;">
-            <div class="mb-4 opacity-75">
+          <div class="p-6 bg-[#282a36] text-[#f8f8f2] font-mono text-sm leading-relaxed min-h-[400px] max-h-[600px] overflow-auto relative">
+            <!-- Watermark Background -->
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+              <div class="watermark-container">
+                <div class="watermark-text">@VamsiPenmetsa</div>
+                <div class="watermark-text">@VamsiPenmetsa</div>
+                <div class="watermark-text">@VamsiPenmetsa</div>
+                <div class="watermark-text">@VamsiPenmetsa</div>
+                <div class="watermark-text">@VamsiPenmetsa</div>
+                <div class="watermark-text">@VamsiPenmetsa</div>
+              </div>
+            </div>
+            <div class="mb-3 opacity-75 relative z-10">
               <span class="text-[#50fa7b]">vamsi@macbook</span>
               <span class="text-[#6272a4]">:~</span>
               <span class="text-white">$ </span>
               <span class="text-[#ffb86c]">cheatsheet</span>
             </div>
-            <div v-if="formattedText" class="whitespace-pre-wrap break-words" style="white-space: pre-wrap; tab-size: 4; -moz-tab-size: 4; word-break: break-word;">
+            <div v-if="formattedText" class="whitespace-pre-wrap break-words relative z-10" style="white-space: pre-wrap; tab-size: 4; -moz-tab-size: 4; word-break: break-word;">
               <div v-for="(line, index) in highlightedLines" :key="index" :class="line.class" v-html="line.html"></div>
             </div>
-            <div v-else class="text-[#6272a4] italic text-center py-8">
+            <div v-else class="text-[#6272a4] italic text-center py-8 relative z-10">
               <div class="text-2xl mb-2">📋</div>
               # Your cheat sheet will appear here...<br>
               # Paste your content above and see the magic!
             </div>
-            <div class="mt-6 opacity-75">
+            <div class="mt-4 opacity-75 relative z-10">
               <span class="text-[#50fa7b]">vamsi@macbook</span>
               <span class="text-[#6272a4]">:~</span>
               <span class="text-white">$ </span>
@@ -200,9 +211,9 @@ export default {
         if (line.trim().startsWith('#')) {
           const level = (line.match(/^#+/) || [''])[0].length;
           const styles = [
-            'color: #bd93f9; font-weight: bold; margin-top: 16px; margin-bottom: 8px; font-size: 15px; border-bottom: 2px solid rgba(189, 147, 249, 0.3); padding-bottom: 6px; line-height: 1.4;',
-            'color: #ff79c6; font-weight: bold; margin-top: 14px; margin-bottom: 6px; font-size: 14px; line-height: 1.4;',
-            'color: #8be9fd; font-weight: bold; margin-top: 12px; margin-bottom: 4px; font-size: 13.5px; line-height: 1.4;',
+            'color: #bd93f9; font-weight: bold; margin-top: 16px; margin-bottom: 8px; font-size: 15px; text-shadow: 0 0 10px rgba(189, 147, 249, 0.5); border-bottom: 2px solid rgba(189, 147, 249, 0.3); padding-bottom: 6px; line-height: 1.4;',
+            'color: #ff79c6; font-weight: bold; margin-top: 14px; margin-bottom: 6px; font-size: 14px; text-shadow: 0 0 8px rgba(255, 121, 198, 0.4); line-height: 1.4;',
+            'color: #8be9fd; font-weight: bold; margin-top: 12px; margin-bottom: 4px; font-size: 13.5px; text-shadow: 0 0 6px rgba(139, 233, 253, 0.3); line-height: 1.4;',
             'color: #ffb86c; font-weight: bold; margin-top: 10px; margin-bottom: 3px; font-size: 13px; line-height: 1.4;'
           ];
           const style = styles[Math.min(level - 1, styles.length - 1)];
@@ -212,18 +223,18 @@ export default {
         else if (line.includes('$') || line.match(/`[^`]+`/)) {
           let highlightedLine = this.escapeHtml(line);
           
-          highlightedLine = highlightedLine.replace(/\$/g, '<span style="color: #50fa7b; font-weight: bold;">$</span>');
-          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span style="color: #8be9fd; font-weight: 600; background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 233, 253, 0.3);">$1</span>');
+          highlightedLine = highlightedLine.replace(/\$/g, '<span style="color: #50fa7b; font-weight: bold; text-shadow: 0 0 5px rgba(80, 250, 123, 0.3);">$</span>');
+          highlightedLine = highlightedLine.replace(/`([^`]+)`/g, '<span style="color: #8be9fd; font-weight: 600; background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 233, 253, 0.3); box-shadow: 0 0 8px rgba(139, 233, 253, 0.2);">$1</span>');
           highlightedLine = highlightedLine.replace(/(\s|^|\$\s*)(kubectl|docker|npm|yarn|git|cd|ls|cat|grep|awk|sed|curl|wget|ssh|sudo|apt|yum|pip|python|node|java|mvn|gradle|terraform|ansible|helm|make|cargo|rustc|go|bash|zsh|powershell|az|gcloud|aws|ng|vue|react|vite|jest|mocha|pytest|cargo|composer|bundle)(\s+|$)/g, 
-            '$1<span style="color: #50fa7b; font-weight: bold;">$2</span>$3');
+            '$1<span style="color: #50fa7b; font-weight: bold; text-shadow: 0 0 5px rgba(80, 250, 123, 0.3);">$2</span>$3');
           highlightedLine = highlightedLine.replace(/(kubectl|docker|git|npm|yarn|az|gcloud|aws)\s+<\/span>\s*(\w+)/g, 
             '$1 </span><span style="color: #8be9fd;">$2</span>');
-          highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span style="color: #ffb86c; font-weight: 500;">$1</span>');
+          highlightedLine = highlightedLine.replace(/(--[\w-]+|-[a-zA-Z])\b/g, '<span style="color: #ffb86c; font-weight: 500; text-shadow: 0 0 5px rgba(255, 184, 108, 0.2);">$1</span>');
           highlightedLine = highlightedLine.replace(/(\s)(=|&gt;|&lt;|\||&amp;&amp;|\|\||&amp;)(\s)/g, '$1<span style="color: #ff79c6; font-weight: bold; padding: 0 2px;">$2</span>$3');
           highlightedLine = highlightedLine.replace(/([{\[\(])/g, '<span style="color: #f8f8f2; font-weight: bold;">$1</span>');
           highlightedLine = highlightedLine.replace(/([}\]\)])/g, '<span style="color: #f8f8f2; font-weight: bold;">$1</span>');
-          highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span style="color: #f1fa8c; font-style: italic;">"$1"</span>');
-          highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span style="color: #f1fa8c; font-style: italic;">\'$1\'</span>');
+          highlightedLine = highlightedLine.replace(/"([^"]*)"/g, '<span style="color: #f1fa8c; font-style: italic; text-shadow: 0 0 5px rgba(241, 250, 140, 0.2);">"$1"</span>');
+          highlightedLine = highlightedLine.replace(/'([^']*)'/g, '<span style="color: #f1fa8c; font-style: italic; text-shadow: 0 0 5px rgba(241, 250, 140, 0.2);">\'$1\'</span>');
           highlightedLine = highlightedLine.replace(/\b(0x[0-9a-fA-F]+|\d+\.?\d*)\b/g, '<span style="color: #bd93f9; font-weight: 600;">$1</span>');
           highlightedLine = highlightedLine.replace(/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/g, '<span style="color: #8be9fd;">$1</span>');
           highlightedLine = highlightedLine.replace(/(https?:\/\/[^\s]+)/g, '<span style="color: #8be9fd; text-decoration: underline; text-decoration-color: rgba(139, 233, 253, 0.3);">$1</span>');
@@ -466,6 +477,44 @@ export default {
         border: 1px solid #44475a;
       `;
 
+      // Add watermark background to export
+      const watermarkContainer = document.createElement('div');
+      watermarkContainer.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        transform: rotate(-25deg);
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+      `;
+
+      // Create multiple watermark text elements
+      for (let i = 0; i < 6; i++) {
+        const watermarkText = document.createElement('div');
+        watermarkText.style.cssText = `
+          font-family: 'Courier New', monospace;
+          font-size: 24px;
+          font-weight: bold;
+          color: rgba(98, 114, 164, 0.08);
+          text-align: center;
+          white-space: nowrap;
+          user-select: none;
+          line-height: 1.5;
+          letter-spacing: 2px;
+          margin: -10px 0;
+          transform: ${i % 2 === 0 ? 'translateX(-50px)' : 'translateX(50px)'};
+        `;
+        watermarkText.textContent = '@VamsiPenmetsa';
+        watermarkContainer.appendChild(watermarkText);
+      }
+      tempElement.appendChild(watermarkContainer);
+
       // Add macOS-style window controls (traffic light buttons) with better styling
       const controlsDiv = document.createElement('div');
       controlsDiv.style.cssText = `
@@ -529,6 +578,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 10;
       `;
 
       const titleText = document.createElement('span');
@@ -546,11 +596,14 @@ export default {
       const textDiv = document.createElement('div');
       textDiv.style.cssText = `
         margin-top: 10px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         white-space: pre-wrap;
         tab-size: 4;
         -moz-tab-size: 4;
         line-height: 1.8;
         letter-spacing: 0.3px;
+        position: relative;
+        z-index: 10;
       `;
       textDiv.innerHTML = this.getExportHighlightedHTML(this.formattedText);
       tempElement.appendChild(textDiv);
@@ -565,6 +618,8 @@ export default {
         color: #6272a4;
         font-size: 10px;
         opacity: 0.7;
+        position: relative;
+        z-index: 10;
       `;
       footer.textContent = 'Created with ❤️ by Vamsi Penmetsa';
       tempElement.appendChild(footer);
@@ -626,52 +681,50 @@ textarea {
 :deep(.hl-heading-1) { 
   color: #bd93f9; 
   font-weight: bold; 
-  margin-top: 16px; 
-  margin-bottom: 8px;
+  margin-top: 12px; 
+  margin-bottom: 4px;
   font-size: 15px; 
-  line-height: 1.4;
+  text-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
   border-bottom: 2px solid rgba(189, 147, 249, 0.3);
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 :deep(.hl-heading-2) { 
   color: #ff79c6; 
   font-weight: bold; 
-  margin-top: 14px; 
-  margin-bottom: 6px;
+  margin-top: 10px; 
+  margin-bottom: 3px;
   font-size: 14px;
-  line-height: 1.4;
+  text-shadow: 0 0 8px rgba(255, 121, 198, 0.4);
 }
 :deep(.hl-heading-3) { 
   color: #8be9fd; 
   font-weight: bold; 
-  margin-top: 12px; 
-  margin-bottom: 4px;
+  margin-top: 8px; 
+  margin-bottom: 2px;
   font-size: 13.5px;
-  line-height: 1.4;
+  text-shadow: 0 0 6px rgba(139, 233, 253, 0.3);
 }
 :deep(.hl-heading-4) { 
   color: #ffb86c; 
   font-weight: bold; 
-  margin-top: 10px; 
-  margin-bottom: 3px;
+  margin-top: 6px; 
   font-size: 13px;
-  line-height: 1.4;
 }
 
 :deep(.hl-command) { 
   color: #50fa7b; 
   font-weight: bold;
-  line-height: 1.8;
-  margin-bottom: 2px;
-  padding-left: 4px;
+  text-shadow: 0 0 5px rgba(80, 250, 123, 0.3);
 }
 :deep(.hl-flag) { 
   color: #ffb86c;
   font-weight: 500;
+  text-shadow: 0 0 5px rgba(255, 184, 108, 0.2);
 }
 :deep(.hl-string) { 
   color: #f1fa8c;
   font-style: italic;
+  text-shadow: 0 0 5px rgba(241, 250, 140, 0.2);
 }
 :deep(.hl-number) { 
   color: #bd93f9;
@@ -687,39 +740,32 @@ textarea {
 :deep(.hl-key) { 
   color: #ff79c6; 
   font-weight: 700;
-  line-height: 1.8;
-  margin-bottom: 2px;
+  text-shadow: 0 0 5px rgba(255, 121, 198, 0.3);
 }
 :deep(.hl-value) { 
   color: #f1fa8c;
-  margin-left: 6px;
+  margin-left: 4px;
 }
 :deep(.hl-bullet) { 
   color: #50fa7b; 
   font-weight: bold;
   font-size: 16px;
-  margin-right: 4px;
-  line-height: 1.9;
-  margin-bottom: 3px;
+  margin-right: 2px;
 }
 :deep(.hl-comment) { 
   color: #6272a4; 
   font-style: italic;
   opacity: 0.8;
-  line-height: 1.7;
-  margin-bottom: 2px;
 }
 :deep(.hl-default) { 
   color: #f8f8f2;
-  line-height: 1.8;
-  margin-bottom: 2px;
-  padding-left: 4px;
+  line-height: 1.6;
 }
 :deep(.hl-backtick) { 
   color: #8be9fd; 
   font-weight: 600; 
   background: linear-gradient(135deg, rgba(139, 233, 253, 0.15), rgba(98, 114, 164, 0.15)); 
-  padding: 3px 7px; 
+  padding: 2px 6px; 
   border-radius: 4px;
   border: 1px solid rgba(139, 233, 253, 0.3);
   box-shadow: 0 0 8px rgba(139, 233, 253, 0.2);
@@ -727,7 +773,7 @@ textarea {
 :deep(.hl-operator) {
   color: #ff79c6;
   font-weight: bold;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 :deep(.hl-bracket) {
   color: #f8f8f2;
@@ -736,37 +782,51 @@ textarea {
 :deep(.hl-error) {
   color: #ff5555;
   font-weight: bold;
-  padding: 2px 6px;
-  background: rgba(255, 85, 85, 0.15);
-  border-radius: 3px;
-  line-height: 1.8;
-  margin-bottom: 3px;
 }
 :deep(.hl-success) {
   color: #50fa7b;
   font-weight: bold;
-  padding: 2px 6px;
-  background: rgba(80, 250, 123, 0.15);
-  border-radius: 3px;
-  line-height: 1.8;
-  margin-bottom: 3px;
 }
 :deep(.hl-warning) {
   color: #ffb86c;
   font-weight: bold;
-  padding: 2px 6px;
-  background: rgba(255, 184, 108, 0.15);
-  border-radius: 3px;
-  line-height: 1.8;
-  margin-bottom: 3px;
 }
 :deep(.hl-info) {
   color: #8be9fd;
-  font-weight: 600;
-  padding: 2px 6px;
-  background: rgba(139, 233, 253, 0.15);
-  border-radius: 3px;
-  line-height: 1.8;
-  margin-bottom: 3px;
+}
+
+/* Watermark Styles */
+.watermark-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  transform: rotate(-25deg);
+  pointer-events: none;
+}
+
+.watermark-text {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(98, 114, 164, 0.08);
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  line-height: 1.5;
+  letter-spacing: 2px;
+  margin: -10px 0;
+}
+
+.watermark-text:nth-child(odd) {
+  transform: translateX(-50px);
+}
+
+.watermark-text:nth-child(even) {
+  transform: translateX(50px);
 }
 </style>
